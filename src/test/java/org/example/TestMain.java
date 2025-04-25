@@ -14,10 +14,9 @@ import static org.example.TestUtils.assertTrue;
 public class TestMain {
 
     @Test
-    public void test_getCard() throws Exception {
+    public void test_getCard_ShouldRecognizeCardsOnImages() throws Exception {
         File[] imgFiles = new File("img").listFiles();
-        for (int i = 0; i < imgFiles.length; i++) {
-            File imgFile = imgFiles[i];
+        for (File imgFile : imgFiles) {
             testFile(imgFile);
         }
     }
