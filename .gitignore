@@ -38,5 +38,4 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-img
 src/main/resources/patterns

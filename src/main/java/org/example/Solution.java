@@ -203,7 +203,7 @@ public class Solution {
     private static void init() throws Exception {
         File patternsDir = new File("src/main/resources/patterns");
         if (!patternsDir.exists()) {
-            patternsDir.mkdir();
+            patternsDir.mkdirs();
         }
         File[] patternFiles = patternsDir.listFiles();
         if (patternFiles.length < 17) {
