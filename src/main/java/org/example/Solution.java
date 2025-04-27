@@ -30,16 +30,7 @@ public class Solution {
     private static final Map<String, char[][]> dict = new HashMap<>();
 
     static {
-        try {
-            File[] imgFiles = new File("src/main/resources/patterns").listFiles();
-            for (File imgFile : imgFiles) {
-                String k = imgFile.getName().split("\\.")[0];
-                char[][] v = readContent(imgFile);
-                dict.put(k, v);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize pattern dictionary", e);
-        }
+        initDictionary();
     }
 
     public static String getCard(BufferedImage img, int index) {
@@ -115,6 +106,20 @@ public class Solution {
         return sb.toString();
     }
 
+    private static void initDictionary() {
+        try {
+            File[] imgFiles = new File("src/main/resources/patterns").listFiles();
+            if (imgFiles == null) return;
+            for (File imgFile : imgFiles) {
+                String k = imgFile.getName().split("\\.")[0];
+                char[][] v = readContent(imgFile);
+                dict.put(k, v);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize pattern dictionary", e);
+        }
+    }
+
     private static boolean isWhite(int rgb) {
         return rgb == -1 || rgb == -8882056;
     }
@@ -160,18 +165,14 @@ public class Solution {
     private static void buildSamples() throws Exception {
         File imgDir = new File("img");
         File[] files = imgDir.listFiles();
-        for (int fileIndex = 0; fileIndex < files.length; fileIndex++) {
-            File imgFile = files[fileIndex];
+        for (File imgFile : files) {
             char[] cards = imgFile.getName().split("\\.")[0].toCharArray();
             int cardIndex = 0;
             for (int i = 0; i < cards.length; cardIndex++) {
                 String rank = "";
                 for (; ; i++) {
-                    if (RANK_CHARS.contains(cards[i])) {
-                        rank += cards[i];
-                    } else {
-                        break;
-                    }
+                    if (!RANK_CHARS.contains(cards[i])) break;
+                    rank += cards[i];
                 }
                 BufferedImage img = ImageIO.read(new File("img/" + imgFile.getName()));
                 processSample(rank, getRankSample(img, cardIndex));
@@ -186,7 +187,44 @@ public class Solution {
         }
     }
 
+    private static String processFile(File file) throws Exception {
+        BufferedImage img = ImageIO.read(file);
+        StringBuilder result = new StringBuilder();
+        result.append(file.getName()).append(" - ");
+        for (int i = 0; i < 5; i++) {
+            if (!cardExists(img, i)) break;
+
+            result.append(getCard(img, i)).append(" ");
+        }
+
+        return result.toString();
+    }
+
+    private static void init() throws Exception {
+        File patternsDir = new File("src/main/resources/patterns");
+        if (!patternsDir.exists()) {
+            patternsDir.mkdir();
+        }
+        File[] patternFiles = patternsDir.listFiles();
+        if (patternFiles.length < 17) {
+            for (File patternFile : patternFiles) {
+                patternFile.delete();
+            }
+            buildSamples();
+            initDictionary();
+        }
+    }
+
     public static void main(String[] args) throws Exception {
-        buildSamples();
+        init();
+
+        File fileDir = new File(args[0]);
+        if (!fileDir.exists() || !fileDir.isDirectory() || fileDir.listFiles() == null) {
+            throw new IllegalArgumentException(String.format("Failed to read image files from directory %s", args[0]));
+        }
+
+        for (File file : fileDir.listFiles()) {
+            System.out.println(processFile(file));
+        }
     }
 }

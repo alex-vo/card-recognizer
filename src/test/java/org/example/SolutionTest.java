@@ -11,17 +11,17 @@ import static org.example.Solution.cardExists;
 import static org.example.Solution.getCard;
 import static org.example.TestUtils.assertTrue;
 
-public class TestMain {
+public class SolutionTest {
 
     @Test
     public void test_getCard_ShouldRecognizeCardsOnImages() throws Exception {
         File[] imgFiles = new File("img").listFiles();
-        for (File imgFile : imgFiles) {
-            testFile(imgFile);
+        for (File img : imgFiles) {
+            testImg(img);
         }
     }
 
-    private void testFile(File file) throws Exception {
+    private void testImg(File file) throws Exception {
         BufferedImage img = ImageIO.read(file);
         char[] cardNames = file.getName().split("\\.")[0].toCharArray();
         int cardIndex = 0;
